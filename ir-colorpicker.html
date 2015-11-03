@@ -1,13 +1,9 @@
 <!--
 @license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+Copyright (c) 2015 Igor Rubinovich. All rights reserved.
+MIT license
 -->
-  
+
 <dom-module id="ir-colorpicker">
   <style>
     :host {
@@ -42,68 +38,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	}
 	
 	
-	.slider paper-slider {
-		width : 90%;
-	}
-	
-	.slider paper-input {
-		margin-top : -20px;
-		width : 10%;
-	}
-	
-	paper-slider.blue {
-      --paper-slider-knob-color: var(--paper-light-blue-500);
-      --paper-slider-active-color: var(--paper-light-blue-500);
-    }
-
-    paper-slider.red {
-      --paper-slider-knob-color: var(--paper-red-500);
-      --paper-slider-active-color: var(--paper-red-500);
-    }
-
-    paper-slider.green {
-      --paper-slider-knob-color: var(--paper-green-500);
-      --paper-slider-active-color: var(--paper-green-500);
-    }
-
-
 	
   </style>
   <template>
-	<iron-icon icon="edit">
-	</iron-icon>
-	<canvas on-click="pickColorFromCanvas" width="300" height="250" id="colorSpace">
-	</canvas>
-	<paper-radio-group on-change="sliderChanged">
-		<paper-radio-button class="slider layout horizontal center" value="1">
-			
-		</paper-radio-button><paper-slider min="0" max="255" class="red" value="{{ sliderR }}"></paper-slider><paper-input value="{{ sliderR }"></paper-input>
-		<paper-radio-button class="slider layout horizontal center" value="2">
-			
-		</paper-radio-button><paper-slider min="0" max="255" class="green" value="{{ sliderG }}"></paper-slider><paper-input value="{{ sliderG }"></paper-input>
-		<paper-radio-button class="slider layout horizontal center" value="3">
-			
-		</paper-radio-button><paper-slider min="0" max="255" class="blue" value="{{ sliderB }}"></paper-slider><paper-input value="{{ sliderB }"></paper-input>	
-	</paper-radio-group>	
-
-	<paper-button id="non-prompt-opener" hidden$="{{ promptMode }}" on-click="open" style$="{{ bgColor(value) }}"></paper-button>
+    <paper-button id="non-prompt-opener" hidden$="{{ promptMode }}" on-click="open" style$="{{ bgColor(value) }}"></paper-button>
 	<paper-dialog id="dialog">
 	  <h2>{{ title }}</h2>
-	  
 	  <paper-dialog-scrollable>
-		<paper-tabs selected="{{ selectedTab }}">
-			<paper-tab>standard</paper-tab>
-			<paper-tab>custom</paper-tab>
-		</paper-tabs>
-		<iron-pages selected="{{ selectedTab }}" selected="0">
-			<div>
-				<template is="dom-repeat" items="{{ colors }}">
-					<paper-button color="{{ item }}" on-tap="selectColor" on-dblclick="selectAndClose" style$="{{ bgColor(item) }}"></paper-button>
-				</template>
-			</div>
-			<div>
-			</div>
-		</iron-pages>
+		<template is="dom-repeat" items="{{ colors }}">
+			<paper-button color="{{ item }}" on-tap="selectColor" on-dblclick="selectAndClose" style$="{{ bgColor(item) }}"></paper-button>
+		</template>
 	  </paper-dialog-scrollable>
 	  <div class="buttons">
 		<paper-button dialog-dismiss on-tap="cancel">Cancel</paper-button>
@@ -129,26 +73,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			notify : true
 		  },
 		  
-		  opened : {
-			type : Boolean,
-			value : false,
-			notify : true
-		  },
-		  
 		  title : {
 			type : String,
 			value : "",
 			notify : true
-		  },
-		  colorspaceX : {
-			type : Array,
-			value : [],
-            notify: true
-		  }, 
-		  colorspaceY : {
-			type : Array,
-			value : [],
-            notify: true
 		  }
         },
 		
@@ -205,28 +133,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				this.inPromptMode = false;
 			}
 		},
-		
-		attached : function() {
-			if(this.opened)
-				this.$.dialog.open();
-
-		},
-		
-		colorSpaceFill : function(x, y) {
-			console.log("aa")
-			return "fill:rgb(" + x + "," + y + "," + "0" + ")"
-		},
 		 
 		ready : function() {
 			var colors = [], r, g, b, gr, hgr;
-			
-			this.selectedTab = 1;
 			
 			// colors
 			for(r = 255; r > 0; r -= 64)
 				for(g = 1; g <= 255; g += 64)
 					for(b = 1; b <= 255; b += 64)
-						colors.push(rgbToHex(r,g,b));
+						colors.push(["#", d2h(r, 2), d2h(g, 2), d2h(b, 2)].join(''));
 
 			// greys
 			for(gr = 1; gr <= 255; gr += 16)
@@ -234,73 +149,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 						
 			console.log(colors);
 			this.set("colors", colors);
-
-			if(this.opened)
-				this.$.dialog.open();
-				
-			//this.sliderR = 
-			//this.sliderG = 
-			//this.sliderB = 
-			
-		},
-		
-		attached : function() {
-			this.setupColorSpace();
-		},
-		
-		setupColorSpace : function() {
-			var colorspaceX = this.getColorSpace(),
-				colorspaceY = this.getColorSpace(),
-				x, y, r, ctx;
-				
-			ctx = this.$.colorSpace.getContext('2d');
-			
-			for(x = 0; x < 255; x++)
-				for(y = 0; y < 255; y++)
-				{
-					ctx.fillStyle = "rgb(" + x + "," + y + "," + "0" + ")";
-					ctx.fillRect(x,y,x+1,y+1);
-				}				
-		},
-		
-		pickColorFromCanvas : function(e) {
-			var canvas = this.$.colorSpace,
-				ctx = canvas.getContext('2d'),
-
-				bc = canvas.getBoundingClientRect(),
-				
-				x = e.pageX - bc.left,
-				y = e.pageY - bc.top;
-
-				p = ctx.getImageData(x, y, 1, 1).data; 
-				hex = rgbToHex(p[0], p[1], p[2]);
-
-			console.log(x,y,hex);
-			
-			this.set('value', hex);
-			this.set('sliderR', p[0]);
-			this.set('sliderG', p[1]);
-			this.set('sliderB', p[2]);
-		},
-
-		getColorSpace : function() {
-			var i, a = [];
-			for(i = 0; i < 256; i++)
-				a.push(i);
-
-			console.log(a);
-			return a;
-		},
-
-		sliderChanged : function() {
-			console.log(this.sliderR);
-			console.log(this.sliderG);
-			console.log(this.sliderB);
-			this.set('value', rgbToHex(this.sliderR,this.sliderG,this.sliderB));
 		}
-		
       });
-	  
 	  
 	  // convert positive decimal to hex string
 	  var hexdigits = "0123456789ABCDEF".split("");
@@ -308,41 +158,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		var unpadded = d ? d2h(Math.floor(d / 16)) + hexdigits[d % 16] : "";
 		
 		while(minLen && (unpadded.length < minLen))
-			unpadded = "0" + unpadded;
+			unpadded = "0" + unpadded, minLen--;
 		
 		return unpadded;
-	  }
-	  
-	  function h2d(h) {
-		var a = h.replace(/^#/).toLowerCase().split(), 
-			res = 0, 
-			coeff = 1, 
-			zeroCode = "0".charCodeAt(0), 
-			aCode = "a".charCodeAt(0),
-			c, v;
-		
-		while(c = a.pop())
-		{
-			if(/\d/.test(c))
-				v = c.charCodeAt(0) - zeroCode;
-			else
-				v = c.charCodeAt(0) - aCode + 10;
-			
-			res += (v) * coeff;
-			coeff *= 16;
-		}
-		
-		return res;
-	  }
-	  
-	  function hexToRgb(hexColor)
-	  {
-		
-	  }
-	  
-	  function rgbToHex(r,g,b)
-	  {
-		return ["#", d2h(r, 2), d2h(g, 2), d2h(b, 2)].join('');
 	  }
     })();
   </script>
