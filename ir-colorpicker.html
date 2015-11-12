@@ -106,12 +106,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-icon>
 
 
-
-
-
-
-
-
     <paper-button id="non-prompt-opener" hidden$="{{ promptMode }}" on-click="open" style$="{{ bgColor(value) }}"></paper-button>
     <paper-dialog id="dialog">
       <h2>{{ title }}</h2>
@@ -126,14 +120,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <template is="dom-repeat" items="{{ colors }}">
               <paper-button color="{{ item }}" on-tap="selectColor" on-dblclick="selectAndClose" style$="{{ bgColor(item) }}"></paper-button>
             </template>
+            <hr/>
+            <template is="dom-repeat" items="{{ colors2 }}">
+              <paper-button color="{{ item }}" on-tap="selectColor" on-dblclick="selectAndClose" style$="{{ bgColor(item) }}"></paper-button>
+            </template>
+
           </div>
           <div>
             <div class="color"  id="color">
 
             </div>
-            <paper-input id="manual" label="Input label" on-change="typeColor" value={{wheelValue}}></paper-input>
+
           </div>
         </iron-pages>
+        <paper-input id="manual" label="Input label" on-change="typeColor" value={{wheelValue}}>
+          <div prefix>#</div>
+        </paper-input>
+
+
       </paper-dialog-scrollable>
       <div class="buttons">
         <paper-button dialog-dismiss on-tap="cancel">Cancel</paper-button>
@@ -155,6 +159,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             notify: true
           },
 
+          customcolors: {
+            type: String,
+            notify: true,
+            reflect:true
+
+          },
+          colors2: {
+            type: Array,
+            notify: true
+          },
           promptMode : {
             type : Boolean,
             value : false,
@@ -256,8 +270,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           for(gr = 1; gr <= 255; gr += 16)
             hgr = d2h(gr,2), colors.push(["#", hgr, hgr, hgr].join(''));
 
+          var colors3=['#cd4a4a','#cc6666','#bc5d58','#ff5349','#fd5e53','#fd7c6e','#fdbcb4','#ff6e4a','#ffa089','#ea7e5d','#b4674d','#a5694f','#ff7538','#ff7f49','#dd9475','#ff8243','#ffa474','#9f8170','#cd9575','#efcdb8','#d68a59','#deaa88','#faa76c','#ffcfab','#ffbd88','#fdd9b5','#ffa343','#efdbc5','#ffb653','#e7c697','#8a795d','#fae7b5','#ffcf48','#fcd975','#fddb6d','#fce883','#f0e891','#eceabe','#bab86c','#fdfc74','#fdfc74','#ffff99','#c5e384','#b2ec5d','#87a96b','#a8e4a0','#1df914','#76ff7a','#71bc78','#6dae81','#9fe2bf','#1cac78','#30ba8f','#45cea2','#3bb08f','#1cd3a2','#17806d','#158078','#1fcecb','#78dbe2','#77dde7','#80daeb','#414a4c','#199ebd','#1ca9c9','#1dacd6','#9aceeb','#1a4876','#1974d2','#2b6cc4','#1f75fe','#c5d0e6','#b0b7c6','#5d76cb','#a2add0','#979aaa','#adadd6','#7366bd','#7442c8','#7851a9','#9d81ba','#926eae','#cda4de','#8f509d','#c364c5','#fb7efd','#fc74fd','#8e4585','#ff1dce','#ff1dce','#ff48d0','#e6a8d7','#c0448f','#6e5160','#dd4492','#ff43a4','#f664af','#fcb4d5','#ffbcd9','#f75394','#ffaacc','#e3256b','#fdd7e4','#ca3767','#de5d83','#fc89ac','#f780a1','#c8385a','#ee204d','#ff496c','#ef98aa','#fc6c85','#fc2847','#ff9baa','#cb4154','#ededed','#dbd7d2','#cdc5c2','#95918c','#232323']
 
-          this.set("colors", colors);
+          this.set("colors", colors3);
 
           if(this.opened)
             this.$.dialog.open();
@@ -266,9 +281,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
 
         attached : function() {
+          if(this.opened)
+            this.$.dialog.open();
           this.createColorWheel();
           this.wheelLoad();
-
+          this.colors2 = JSON.parse(this.customcolors);
 
         },
 
@@ -380,9 +397,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               b = hue2rgb(p, q, h - 1/3);
             }
 
-              r= r * 255;
-              g= g * 255;
-              b= b * 255;
+            r= r * 255;
+            g= g * 255;
+            b= b * 255;
 
             var hex = [
               pad2(Math.round(r).toString(16)),
@@ -956,13 +973,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           picker.on('changed', function() {
             wheelValue = picker.hex()
             that.value = picker.hex()
-            console.log(wheelValue)
             that.set("wheelValue", wheelValue);
           })
 
 
 
-      }
+        }
 
       });
 
