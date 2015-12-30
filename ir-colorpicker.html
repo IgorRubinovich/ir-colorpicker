@@ -216,7 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           setTimeout(function() {
             that.$.dialog.open();
             that.prevValue = this.value;
-          }, 100);
+          }, 300);
         },
 
         prompt : function(callback) {
@@ -258,7 +258,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         ready : function() {
           var colors = [], r, g, b, gr, hgr;
 
-          this.selectedTab = 1;
+          this.selectedTab = 0;
 
           // colors
           for(r = 255; r > 0; r -= 64)
