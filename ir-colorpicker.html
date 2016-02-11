@@ -964,8 +964,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           var that = this;
           var wheelValue;
           var color= document.getElementById('color');
-          var picker = (new thistle.Picker('rgb(129,34,203'))
-          color.appendChild(picker.el);
+          var picker = (new thistle.Picker('rgb(129,34,203'));
+          if(color) color.appendChild(picker.el);
+
           wheelValue = picker.hex()
           this.value = picker.hex()
           this.set("wheelValue", wheelValue);
